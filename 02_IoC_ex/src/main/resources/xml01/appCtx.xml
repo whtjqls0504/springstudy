@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Contact -->
+    <bean class="com.gdu.app02.xml01.Contact" id="contact">
+      <property name="mobile" value="010-7777-9999" />
+      <property name="fax" value="00-0000-0000" />
+    </bean>
+    
+    <!-- Address -->
+    <bean class="com.gdu.app02.xml01.Address" id="address">
+      <property name="postcode" value="경기도" />
+      <property name="jibun" value="양산로" />
+      <property name="road" value="인천"></property>
+    </bean>
+    
+    <!-- Person -->
+    <bean class="com.gdu.app02.xml01.Person" id="person">
+      <constructor-arg value="홍길동" />
+      <constructor-arg ref="contact" />
+      <constructor-arg ref="address" />
+    </bean>
+
+
+</beans>
