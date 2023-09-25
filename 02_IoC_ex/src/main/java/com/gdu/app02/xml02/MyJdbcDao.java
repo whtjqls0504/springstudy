@@ -8,21 +8,21 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 public class MyJdbcDao {
 
   private Connection con;
+  private AbstractApplicationContext ctx;
+  private MyjdbcConnection myjdbcConnection;
   
   public Connection getConnection() {
-    // 반환값 : MyJdbcConnection 클래스의 getConnection() 메소드 호출
-    AbstractApplicationContext ctx = new GenericXmlApplicationContext("xml02/appCtx.xml");
-    
-    MyjdbcConnection myjdbcConnection = ctx.getBean("myJdbcConnection", MyjdbcConnection.class);
-    ctx.close();      // 닫기
-    return myjdbcConnection.getConnection();  // 반환하기
+    ctx = new GenericXmlApplicationContext("xml02/appCtx.xml");
+    myjdbcConnection = ctx.getBean("myJdbcConnection", MyjdbcConnection.class);
+    ctx.close();
+    return myjdbcConnection.getConnection();
   }
   
   private void close() {
     try {
       if(con != null)
         con.close();
-      System.out.println("GD 접속 해제");
+      System.out.println(myjdbcConnection.getUser() + " 접속 해제");
     } catch (Exception e) {
       e.printStackTrace();
     }
