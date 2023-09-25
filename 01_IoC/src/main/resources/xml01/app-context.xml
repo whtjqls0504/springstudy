@@ -6,4 +6,31 @@
   <!-- Calculator calc = new Calculator(); 를 수행하는 bean 태그 -->
   <bean class="com.gdu.app01.xml01.Calculator" id="calc" scope="singleton"></bean>
 
+  <!-- 
+    1. 디폴트 생성자 + setter 
+      Person man = new Person();
+      man.setName("뽀로로");
+      man.setAge(20);
+      man.setCalculator(calc);
+   -->
+  <bean class="com.gdu.app01.xml01.Person" id="man">
+    <property name="name" value="뽀로로" />
+    <property name="age" value="20" />
+    <property name="calculator" ref="calc" />
+  </bean>
+  
+  
+  <!-- 
+    2. 필드를 이용한 생성자
+      Person woman = new Person("패티", 20, calc);
+     -->
+     
+   <bean class="com.gdu.app01.xml01.Person" id="woman">
+      <constructor-arg value="패티" />
+      <constructor-arg value="20" />
+      <constructor-arg ref="calc" />
+   </bean>
+   
+   
+   
 </beans>
