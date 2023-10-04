@@ -16,5 +16,10 @@
     <img src="${contextPath}/resources/image/animal1.jpg"  width="192px">
   </div>
    
+  <div>
+    <a href="${contextPath}/write.do">작성화면으로 가기</a>
+  </div>
+  
+  
 </body>
 </html>
