@@ -1,0 +1,25 @@
+package com.gdu.app07.controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.gdu.app07.dto.AjaxDto;
+import com.gdu.app07.service.AjaxService;
+
+import lombok.RequiredArgsConstructor;
+
+@RequestMapping
+@RestController             // 모든 메소드에 @ResponseBody를 추가하는 @Controller 이다.
+@RequiredArgsConstructor
+public class AjaxController2 {
+
+  private final AjaxService ajaxService;
+
+  public List<AjaxDto> getDtoList(){
+    return ajaxService.getDtoList();
+  }
+
+
+}
