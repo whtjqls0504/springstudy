@@ -4,7 +4,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
-	<bean class="com.gdu.app07.dto.AjaxDto" id="a">
+
+  <bean class="com.gdu.app07.dto.AjaxDto" id="a">
       <property name="name" value="뽀로로" />
       <property name="age" value="20" />
   </bean>
