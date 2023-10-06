@@ -5,5 +5,5 @@ import java.util.Map;
 public interface MemberService {
 
   public Map<String, Object> getBmiInfo(int memberNo);
-  
+  public byte[] getProfileImage(int memberNo);          // byte[] 배열 선언
 }
