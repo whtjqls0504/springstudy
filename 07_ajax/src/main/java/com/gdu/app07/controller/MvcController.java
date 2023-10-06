@@ -30,4 +30,11 @@ public class MvcController {
      return "ajax3";
   }
   
+  // ajax4.do
+  @RequestMapping(value = "/ajax4.do", method = RequestMethod.GET)
+  public String ajax4() {
+     return "ajax4";
+  }
+  
+  
 }
