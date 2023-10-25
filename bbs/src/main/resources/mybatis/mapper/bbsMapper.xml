@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- mapper namespace : mapper의 경로 -->
+<mapper namespace="com.gdu.bbs.dao.BbsMapper">
+
+  <!-- 목록(begin/end 전달, List 반환) -->
+  <!-- List안에 뭐가 들어갔는지, <>의 값을 resultType 반환하는 것이다. -->
+  <!--  -->
+  <select id="getBbsList" parameterType="Map" resultType="BbsDto">
+    SELECT BBS_NO, EDITOR, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
+      FROM (SELECT ROW_NUMBER() OVER(ORDER BY BBS_NO DESC) AS RN BBS_NO, EDITOR, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
+              FROM BBS_T)
+     WHERE RN BETWEEN #{begin} AND #{end}
+  </select>
+  
+
+
+</mapper>
