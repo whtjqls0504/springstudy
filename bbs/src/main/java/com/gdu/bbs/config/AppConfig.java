@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-@MapperScan(basePackages="com.gdu.app12.dao")
+@MapperScan(basePackages="com.gdu.bbs.dao")
 @PropertySource(value="classpath:application.properties")
 @EnableScheduling             // @Scheduled 허용
 @EnableTransactionManagement  // @Transactional 허용

@@ -11,8 +11,8 @@
 </head>
 <body>
 
-  <h3>보충수업</h3>
-
+  <h1>보충수업</h1>
+  <a href="${contextPath}/bbs/list.do">게시판</a>
 
 </body>
 </html>

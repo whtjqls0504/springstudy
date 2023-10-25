@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class BbsDto {
-  private int bbs_no;
+  private int bbsNo;
   private String editor;
   private String title;
   private String contents;
-  private Date created_at;
-  private Date modified_at;
+  private Date createdAt;
+  private Date modifiedAt;
   
 }
