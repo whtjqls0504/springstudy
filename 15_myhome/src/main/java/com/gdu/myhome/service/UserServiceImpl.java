@@ -1,6 +1,7 @@
 package com.gdu.myhome.service;
 
-import java.io.BufferedReader;import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -10,7 +11,6 @@ import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -40,7 +40,6 @@ public class UserServiceImpl implements UserService {
   
   private final String client_id = "dxLQ_GbhqsM3QHNFLIB3";
   private final String client_secret = "CsMJ8FIn4F";
-  
   
   @Override
   public void login(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -79,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
     
   }
-  
+
   @Override
   public String getNaverLoginURL(HttpServletRequest request) throws Exception {
     
@@ -100,8 +99,6 @@ public class UserServiceImpl implements UserService {
     sb.append("&redirect_uri=").append(redirect_uri);
     sb.append("&state=").append(state);
     
-    request.getSession().setAttribute("state", state);
-    
     return sb.toString();
     
   }
@@ -117,10 +114,9 @@ public class UserServiceImpl implements UserService {
     String code = request.getParameter("code");
     String state = request.getParameter("state");
     
-    String apiURL = "https://nid.naver.com/oauth2.0/token ";
-    String grant_type = "authorization_code";   // access_token 발급 받을 때 사용하는 값(갱신이나 삭제 시에는 다른 값을 사용함)
+    String apiURL = "https://nid.naver.com/oauth2.0/token";
+    String grant_type = "authorization_code";  // access_token 발급 받을 때 사용하는 값(갱신이나 삭제시에는 다른 값을 사용함)
     
-    // 주소 만들기
     StringBuilder sb = new StringBuilder();
     sb.append(apiURL);
     sb.append("?grant_type=").append(grant_type);
@@ -132,12 +128,10 @@ public class UserServiceImpl implements UserService {
     // 요청
     URL url = new URL(sb.toString());
     HttpURLConnection con = (HttpURLConnection)url.openConnection();
-    con.setRequestMethod("GET");        // 요청방식. 반드시 대문자로 작성.
-    
-    // json 응답코드
-    BufferedReader reader = null;
+    con.setRequestMethod("GET");  // 반드시 대문자로 작성
     
     // 응답
+    BufferedReader reader = null;
     int responseCode = con.getResponseCode();
     if(responseCode == 200) {
       reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -151,10 +145,120 @@ public class UserServiceImpl implements UserService {
       responseBody.append(line);
     }
     
-    // 응답 결과  -- accessToken
     JSONObject obj = new JSONObject(responseBody.toString());
-    
     return obj.getString("access_token");
+    
+  }
+  
+  @Override
+  public UserDto getNaverProfile(String accessToken) throws Exception {
+    
+    // 네이버 로그인-3
+    // 접근 토큰을 전달한 뒤 사용자의 프로필 정보(이름, 이메일, 성별, 휴대전화번호) 받아오기
+    // 요청 헤더에 Authorization: Bearer accessToken 정보를 저장하고 요청함
+    
+    // 요청
+    String apiURL = "https://openapi.naver.com/v1/nid/me";
+    URL url = new URL(apiURL);
+    HttpURLConnection con = (HttpURLConnection)url.openConnection();
+    con.setRequestMethod("GET");
+    con.setRequestProperty("Authorization", "Bearer " + accessToken);
+    
+    // 응답
+    BufferedReader reader = null;
+    int responseCode = con.getResponseCode();
+    if(responseCode == 200) {
+      reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+    } else {
+      reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+    }
+    
+    String line = null;
+    StringBuilder responseBody = new StringBuilder();
+    while ((line = reader.readLine()) != null) {
+      responseBody.append(line);
+    }
+    
+    // 응답 결과(프로필을 JSON으로 응답) -> UserDto 객체
+    JSONObject obj = new JSONObject(responseBody.toString());
+    JSONObject response = obj.getJSONObject("response");
+    UserDto user = UserDto.builder()
+                    .email(response.getString("email"))
+                    .name(response.getString("name"))
+                    .gender(response.getString("gender"))
+                    .mobile(response.getString("mobile"))
+                    .build();
+    
+    return user;
+    
+  }
+  
+  @Override
+  public UserDto getUser(String email) {
+    return userMapper.getUser(Map.of("email", email));
+  }
+  
+  @Override
+  public void naverJoin(HttpServletRequest request, HttpServletResponse response) {
+    
+    String email = request.getParameter("email");
+    String name = request.getParameter("name");
+    String gender = request.getParameter("gender");
+    String mobile = request.getParameter("mobile");
+    String event = request.getParameter("event");
+    
+    UserDto user = UserDto.builder()
+                    .email(email)
+                    .name(name)
+                    .gender(gender)
+                    .mobile(mobile.replace("-", ""))
+                    .agree(event != null ? 1 : 0)
+                    .build();
+    
+    int naverJoinResult = userMapper.insertNaverUser(user);
+    
+    try {
+      
+      response.setContentType("text/html; charset=UTF-8");
+      PrintWriter out = response.getWriter();
+      out.println("<script>");
+      if(naverJoinResult == 1) {
+        request.getSession().setAttribute("user", userMapper.getUser(Map.of("email", email)));
+        userMapper.insertAccess(email);
+        out.println("alert('네이버 간편가입이 완료되었습니다.')");
+      } else {
+        out.println("alert('네이버 간편가입이 실패했습니다.')");
+      }
+      out.println("location.href='" + request.getContextPath() + "/main.do'");
+      out.println("</script>");
+      out.flush();
+      out.close();
+      
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+  }
+  
+  @Override
+  public void naverLogin(HttpServletRequest request, HttpServletResponse response, UserDto naverProfile) throws Exception {
+    
+    String email = naverProfile.getEmail();
+    UserDto user = userMapper.getUser(Map.of("email", email));
+    
+    if(user != null) {
+      request.getSession().setAttribute("user", user);
+      userMapper.insertAccess(email);
+    } else {
+      response.setContentType("text/html; charset=UTF-8");
+      PrintWriter out = response.getWriter();
+      out.println("<script>");
+      out.println("alert('일치하는 회원 정보가 없습니다.')");
+      out.println("location.href='" + request.getContextPath() + "/main.do'");
+      out.println("</script>");
+      out.flush();
+      out.close();
+    }
     
   }
   
@@ -422,51 +526,8 @@ public class UserServiceImpl implements UserService {
     }
     
   }
+
   
-  @Override
-  public UserDto getNaverProfile(String accessToken) throws Exception {
-    
-    // 네이버로그인-3
-    // 접근 토큰을 전달한 뒤 사용자의 프로필 정보(이름, 이메일, 성별, 휴대전화번호)받아 오기
-    // 요청 헤더에 Authorization: Bearer accessToken 정보를 저장하고 요청함
-    
-    String apiURL = "https://openapi.naver.com/v1/nid/me";
-    URL url = new URL(apiURL);
-    HttpURLConnection con = (HttpURLConnection)url.openConnection();
-    
-    con.setRequestMethod("GET");
-    con.setRequestProperty("Authorization", "Bearer" + accessToken);
-    
-    
-    // json 응답코드
-    BufferedReader reader = null;
-    
-    // 응답
-    int responseCode = con.getResponseCode();
-    if(responseCode == 200) {
-      reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-    } else {
-      reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-    }
-    
-    String line = null;
-    StringBuilder responseBody = new StringBuilder();
-    while ((line = reader.readLine()) != null) {
-      responseBody.append(line);
-    }
-    
-    // 응답 결과(프로필을 JSON으로 응답) -> UserDto 객체
-    JSONObject obj = new JSONObject(responseBody.toString());
-    JSONObject response = obj.getJSONObject("response");
-    UserDto user = UserDto.builder()
-                    .email(response.getString("email"))
-                    .name(response.getString("name"))
-                    .gender(response.getString("gender"))
-                    .mobile(response.getString("mobile"))
-                    .build();
-    
-    return user;
-  }
 }
 
 
