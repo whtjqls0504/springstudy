@@ -7,8 +7,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.gdu.myhome.dao.FreeMapper;
 import com.gdu.myhome.service.FreeService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,7 @@ public class FreeController {
 
   private final FreeService freeService;
   
-  @GetMapping("/write.do")
+  @GetMapping("/write.form")
   public String writeForm() {
     return "free/write";
   }
@@ -38,10 +40,25 @@ public class FreeController {
     return "free/list";
   }
   
+  @PostMapping("/addReply.do")
+  public String addReply(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    int addReplyResult = freeService.addReply(request);
+    redirectAttributes.addFlashAttribute("addReplyResult", addReplyResult);
+    return "redirect:/free/list.do";
+  }
   
+  @PostMapping("/remove.do")            // 파라미터 값이 많을 때, @RequestParam 넣기
+  public String remove(@RequestParam(value = "freeNo") int freeNo, RedirectAttributes redirectAttributes) {
+    int removeResult = freeService.removeFree(freeNo);
+    redirectAttributes.addFlashAttribute("removeResult", removeResult);
+    return "redirect:/free/list.do";    // 돌아가는 곳은 list.
+  }
   
-  
-  
+  @GetMapping("/search.do")
+  public String search(HttpServletRequest request, Model model) {
+    freeService.loadSearchList(request, model);
+    return "free/list";
+  }
   
   
 }

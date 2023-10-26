@@ -11,21 +11,21 @@
 </jsp:include>
 
 <script>
-
-	$(() =>{
-		fnNaverJoin();
-	})
-
-	const fnNaverJoin = () => {
-		$('#frm_naver_join').submit((ev)=> {
-			if(!$('#service').is(':checked')){
-				alert('이용약관에 동의하세요.');
-				ev.preventDefault();  /*  sumit 취소 */
-				return;
-			} 
-		})
-	}
-
+  
+  $(() => {
+	  fnNaverJoin();
+  })
+  
+  const fnNaverJoin = () => {
+	  $('#frm_naver_join').submit((ev) => {
+		  if(!$('#service').is(':checked')){
+			  alert('이용약관에 동의하세요.');
+			  ev.preventDefault();
+			  return;
+		  }
+	  })
+  }
+  
 </script>
 
 <div>
@@ -59,10 +59,8 @@
       <input type="text" name="mobile" id="mobile" value="${naverProfile.mobile}" readonly>
     </div>
 
-
     <hr>
     
-    <!--  -->
     <div>
       <input type="checkbox" name="service" id="service">
       <label for="service">서비스 이용약관 동의(필수)</label>
@@ -78,8 +76,8 @@
     <div>
       <textarea>본 약관은 ...</textarea>
     </div>
-
-
+    
+    <hr>
 
     <div>
       <button type="submit">회원가입하기</button>

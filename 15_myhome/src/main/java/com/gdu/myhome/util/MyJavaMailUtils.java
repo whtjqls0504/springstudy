@@ -38,7 +38,7 @@ public class MyJavaMailUtils {
       // Properties 객체 생성 (이메일 보내는 호스트 정보)
       Properties properties = new Properties();
       properties.put("mail.smtp.host", env.getProperty("spring.mail.host"));
-      properties.put("mail.smtp.port", env.getProperty("spring.mail.port"));
+      properties.put("mail.smtp.port", env.getProperty("spring.mail.host"));
       properties.put("mail.smtp.auth", env.getProperty("spring.mail.properties.mail.smtp.auth"));
       properties.put("mail.smtp.starttls.enable", env.getProperty("spring.mail.properties.mail.smtp.starttls.enable"));
       

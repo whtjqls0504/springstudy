@@ -10,7 +10,6 @@ $(() => {
   fnCheckName();
   fnCheckMobile();
   fnJoin();
-  fnModifyUser();
 })
 
 
@@ -175,22 +174,4 @@ const fnJoin = () => {
     }
   })
 }
-
-const fnModifyUser = () => {
-		$.ajax({
-			// 요청
-			type : 'post',
-			url  : '${contextPath}/user/modify.do', 
-			data : $('#frm_mypage').serialize(),
-			// 응답
-			dataType: 'json'
-			success : (resData) => {	// {"modifyResult" : 1}
-				if(resData.modifyResult === 1){
-					alert('회원 정보가 수정되었습니다.');
-				} else {
-					alert('회원 정보가 수정되지 않았습니다.');
-				}
-			} 
-		})
-	}
  

@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
     
   }
-
+  
   @Override
   public String getNaverLoginURL(HttpServletRequest request) throws Exception {
     
@@ -239,7 +239,7 @@ public class UserServiceImpl implements UserService {
     }
     
   }
-  
+
   @Override
   public void naverLogin(HttpServletRequest request, HttpServletResponse response, UserDto naverProfile) throws Exception {
     
@@ -529,6 +529,7 @@ public class UserServiceImpl implements UserService {
 
   
 }
+
 
 
 
