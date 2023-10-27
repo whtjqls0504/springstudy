@@ -15,6 +15,7 @@ import com.gdu.bbs.util.MyPageUtils;
 
 import lombok.RequiredArgsConstructor;
 
+
 @RequiredArgsConstructor
 @Service
 public class BbsServiceImpl implements BbsService {
@@ -52,6 +53,26 @@ public class BbsServiceImpl implements BbsService {
     
   }
   
+  @Override
+  public BbsDto getBbs(int bbsNo) {
+    BbsDto bbs = bbsMapper.getBbs(bbsNo);    // 이 결과는 BbsDto
+    return bbs;
+  }
   
+  @Override
+  public int addBbs(BbsDto bbs) {
+    return bbsMapper.insertBbs(bbs);    
+  }
+  
+  @Override
+  public int modify(BbsDto bbs) {
+    return bbsMapper.updateBbs(bbs); 
+  }
+  
+  @Override
+  public int remove(BbsDto bbs) {
+    return bbsMapper.removeBbs(bbs);
+    
+  }
   
 }

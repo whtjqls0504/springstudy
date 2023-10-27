@@ -12,7 +12,7 @@
 <body>
 
   <h1>보충수업</h1>
-  <a href="${contextPath}/bbs/list.do">게시판</a>
+  <a href="${contextPath}/list.do">게시판</a>  <!-- /bss 설정을 했기 땜에 필요없슴다. -->
 
 </body>
 </html>

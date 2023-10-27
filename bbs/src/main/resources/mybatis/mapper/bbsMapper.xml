@@ -8,7 +8,6 @@
 
   <!-- 목록(begin/end 전달, List 반환) -->
   <!-- List안에 뭐가 들어갔는지, <>의 값을 resultType 반환하는 것이다. -->
-  <!--  -->
   <select id="getBbsList" parameterType="Map" resultType="BbsDto">
     SELECT BBS_NO, EDITOR, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
       FROM (SELECT ROW_NUMBER() OVER(ORDER BY BBS_NO DESC) AS RN, BBS_NO, EDITOR, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
@@ -21,6 +20,47 @@
     SELECT COUNT(*)
       FROM BBS_T
   </select>
-
-
+  
+  <!-- 상세 보기(전달 int) -->
+  <select id="getBbs" parameterType="int" resultType="BbsDto">
+    SELECT BBS_NO, EDITOR, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
+      FROM BBS_T
+     WHERE BBS_NO =  #{bbsNo}
+  </select>
+  
+  <!-- 삽입(전달 BbsDto bbs, int 반환(INSERT는 resultType 작성 안함(왜??????)) -->
+  <!-- mybatis랑  약속한거 근데 난 약속 안했는데 왜 자구 지혼자 약속함? 야 mybatis나와봐  -->
+  <insert id="insertBbs" parameterType="BbsDto">
+    INSERT INTO BBS_T(
+          BBS_NO
+        , EDITOR
+        , TITLE
+        , CONTENTS
+        , CREATED_AT
+        , MODIFIED_AT
+      ) VALUES(
+          BBS_SEQ.NEXTVAL
+        , #{editor}
+        , #{title}
+        , #{contents}
+        , SYSDATE
+        , NULL
+    )
+  
+  </insert>
+  
+  <!-- 수정(전달 BbsDto bbs, int 반환(UPDATE는 resultType 작성 안함)) -->
+  <update id="updateBbs"  parameterType="BbsDto">
+    UPDATE BBS_T
+       SET TITLE = #{title}
+         , CONTENTS = #{contents}
+         , MODIFIED_AT = SYSDATE
+  </update>
+  
+  <!-- 삭제(전달 int bbsNo, int 반환(DELETE는 resultType 작성 안함) -->
+  <delete id="deleteBbs" parameterMap="int">
+    DELETE 
+      FROM BBS_T
+     WHERE BBS_NO = #{bbsNo}
+  </delete>
 </mapper>
