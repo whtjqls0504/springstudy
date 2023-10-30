@@ -27,7 +27,7 @@
   <hr>
   
   <div>
-    <table border="1">
+    <table border="1" class="table table-striped">
       <thead>
         <tr>
           <td>순번</td>
