@@ -11,8 +11,8 @@ CREATE SEQUENCE COMMENT_SEQ NOCACHE;
 
 
 -- 테이블
-DROP TABLE BLOG_IMAGE_T;
 DROP TABLE COMMENT_T;
+DROP TABLE BLOG_IMAGE_T;
 DROP TABLE BLOG_T;
 DROP TABLE FREE_T;
 DROP TABLE INACTIVE_USER_T;
@@ -101,14 +101,14 @@ CREATE TABLE BLOG_T (
     CONSTRAINT FK_USER_BLOG FOREIGN KEY(USER_NO) REFERENCES USER_T(USER_NO) ON DELETE CASCADE  -- 작성자가 삭제되면 블로그도 함께 삭제된다.
 );
 
-
---블로그 이미지 목록 
+-- 블로그 이미지 목록
 CREATE TABLE BLOG_IMAGE_T (
-    BLOG_NO         NUMBER              NOT NULL,
+    BLOG_NO         NUMBER             NOT NULL,
     IMAGE_PATH      VARCHAR2(100 BYTE),
     FILESYSTEM_NAME VARCHAR2(100 BYTE),
-    CONSTRAINT PK_BLOG_IMAGE FOREIGN KEY(BLOG_NO) REFERENCES BLOG_T(BLOG_NO) ON DELETE CASCADE
+    CONSTRAINT FK_BLOG_IMAGE FOREIGN KEY(BLOG_NO) REFERENCES BLOG_T(BLOG_NO) ON DELETE CASCADE
 );
+
 -- 블로그 댓글(계층형-1차, 댓글 작성 가능/대댓글 작성 불가능)
 CREATE TABLE COMMENT_T (
     COMMENT_NO NUMBER NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE COMMENT_T (
     USER_NO    NUMBER              NULL,
     BLOG_NO    NUMBER              NOT NULL,
     CREATED_AT VARCHAR2(30 BYTE)   NULL,
-    STATUS     NUMBER              NOT NULL,
+    STATUS     NUMBER              NOT NULL,  -- 1:정상, 0:삭제 (실제로 삭제되지 않는 게시판)
     DEPTH      NUMBER              NOT NULL,  -- 0:원글, 1:댓글, 2:대댓글, ...
     GROUP_NO   NUMBER              NOT NULL,  -- 원글과 모든 댓글(댓글, 대댓글)은 동일한 GROUP_NO를 가져야 함
     CONSTRAINT PK_COMMENT PRIMARY KEY(COMMENT_NO),
@@ -129,7 +129,7 @@ INSERT INTO USER_T VALUES(USER_SEQ.NEXTVAL, 'user1@naver.com', STANDARD_HASH('11
 INSERT INTO USER_T VALUES(USER_SEQ.NEXTVAL, 'user2@naver.com', STANDARD_HASH('2222', 'SHA256'), '사용자2', 'F', '01022222222', '22222', '디지털로', '가산동', '101동 101호', 0, 0, TO_DATE('20230801', 'YYYYMMDD'), TO_DATE('20220101', 'YYYYMMDD'));
 INSERT INTO USER_T VALUES(USER_SEQ.NEXTVAL, 'user3@naver.com', STANDARD_HASH('3333', 'SHA256'), '사용자3', 'NO', '01033333333', '33333', '디지털로', '가산동', '101동 101호', 0, 0, TO_DATE('20230601', 'YYYYMMDD'), TO_DATE('20220101', 'YYYYMMDD'));
 
-INSERT INTO ACCESS_T VALUES('user1@naver.com', TO_DATE('20231018', ' YYYYMMDD'));  -- 정상 회원 (user1)
+INSERT INTO ACCESS_T VALUES('user1@naver.com', TO_DATE('20231018', 'YYYYMMDD'));  -- 정상 회원 (user1)
 INSERT INTO ACCESS_T VALUES('user2@naver.com', TO_DATE('20220201', 'YYYYMMDD'));  -- 휴면 회원 (user2)
                                                                                   -- 휴면 회원 (user3)
 COMMIT;
@@ -158,31 +158,43 @@ INSERT INTO FREE_T VALUES (FREE_SEQ.NEXTVAL, 'user1@naver.com', '내용20', SYST
 COMMIT;
 
 
--- 블로그 쿼리 테스트 
+-- 블로그 쿼리 테스트
 
 -- 1. 목록 (사용자 - 블로그 조인)
--- 부모 : 일대다 관계에서 일(PK, UNIQUE)  - 사용자 
--- 자식 : 일대다 관계에서 다(FK)          - 블로그
+
+-- 부모 : 일대다 관계에서 일(PK, UNIQUE) - 사용자
+-- 자식 : 일대다 관계에서 다(FK)         - 블로그
 
 -- 내부 : 사용자와 블로그에 모두 존재하는 데이터를 조인하는 방식
--- 외부 : 사용자가 없는 블로그도 모두 조인하는 방식      (불가능하다. USER_NO가 NOT NULL이기 때문)
---        블로그가 없는 사용자도 모두 조인하는 방식이다. (필요없는 조인)
+-- 외부 : 사용자가 없는 블로그도 모두 조인하는 방식 (불가능)
+--        블로그가 없는 사용자도 모두 조인하는 방식 (필요 없는 방식)
+
 SELECT A.BLOG_NO, A.TITLE, A.CONTENTS, A.USER_NO, A.HIT, A.IP, A.CREATED_AT, A.MODIFIED_AT, A.EMAIL
-  FROM (SELECT ROW_NUMBER() OVER(ORDER BY BLOG_NO DESC) AS RN, B.BLOG_NO , B.TITLE, B.CONTENTS, B.USER_NO, B.HIT, B.IP, B.CREATED_AT, B.MODIFIED_AT, U.EMAIL
-                FROM USER_T U INNER JOIN BLOG_T B
-                    ON B.USER_NO = U.USER_NO) A
-  WHERE A.RN BETWEEN 1 AND 10;
-  
--- BLOG_NO의 내림차순, 정렬하고 행번호 붙이기.
--- 블로그 테이블에 들어있는 정보들을 가져온다. 
--- USER_NO -> BLOG_T, USER_T에 있는 "공동"쿼리이다.
+  FROM (SELECT ROW_NUMBER() OVER(ORDER BY B.BLOG_NO DESC) AS RN, B.BLOG_NO, B.TITLE, B.CONTENTS, B.USER_NO, B.HIT, B.IP, B.CREATED_AT, B.MODIFIED_AT, U.EMAIL
+          FROM USER_T U INNER JOIN BLOG_T B
+            ON B.USER_NO = U.USER_NO) A
+ WHERE A.RN BETWEEN 1 AND 10;
+
+-- 2. 상세
+
+-- 1) 조회수 증가
+UPDATE BLOG_T
+   SET HIT = HIT + 1
+ WHERE BLOG_NO = 1;
+
+-- 2) 블로그 상세 정보 조회
+SELECT B.BLOG_NO, B.TITLE, B.CONTENTS, B.HIT, B.IP, B.CREATED_AT, B.MODIFIED_AT, U.USER_NO, U.EMAIL, U.NAME
+  FROM USER_T U, BLOG_T B
+ WHERE U.USER_NO = B.USER_NO
+   AND B.BLOG_NO = 1;
+
+-- 3) 댓글 목록
 
 
 
 
 
-
--- 쿼리 테스트
+-- 계층 쿼리 테스트
 
 -- 1. 목록 (??? 순으로 1 ~ 10)
 
@@ -216,7 +228,8 @@ SELECT FREE_NO, EMAIL, CONTENTS, CREATED_AT, STATUS, DEPTH, GROUP_NO, GROUP_ORDE
  WHERE RN BETWEEN 11 AND 20;
 
 
--- 쿼리 테스트
+
+-- 사용자 쿼리 테스트
 
 -- 1. 로그인 할 때(이메일, 비밀번호 입력)
 -- 1) 정상 회원

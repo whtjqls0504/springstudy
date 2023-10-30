@@ -165,4 +165,14 @@ public class BlogServiceImpl implements BlogService {
     model.addAttribute("beginNo", total - (page - 1) * display);
   }
   
+  @Override
+  public int increseHit(int blogNo) {
+    return blogMapper.updateHit(blogNo);
+  }
+  
+  @Override
+  public BlogDto getBlog(int blogNo) {
+    return blogMapper.getBlog(blogNo);
+  }
+  
 }
