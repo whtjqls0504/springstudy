@@ -12,10 +12,9 @@ public class FileConfig {
   public MultipartResolver multipartResolver() {
     CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
     commonsMultipartResolver.setDefaultEncoding("UTF-8");
-    commonsMultipartResolver.setMaxUploadSize(1024 * 1024 * 100);         // 전체 첨부 파일의 크기 최대 100MB
-    commonsMultipartResolver.setMaxUploadSizePerFile(1024 * 1024 * 10);   // 개별 첨부 파일의 최대 크기 10MB
+    commonsMultipartResolver.setMaxUploadSize(1024 * 1024 * 100);       // 전체 첨부 파일의 최대 크기 100MB
+    commonsMultipartResolver.setMaxUploadSizePerFile(1024 * 1024 * 10); // 개별 첨부 파일의 최대 크기 10MB
     return commonsMultipartResolver;
   }
-  
   
 }

@@ -104,9 +104,44 @@
        AND B.BLOG_NO = #{blogNo}
   </select>
   
+  <insert id="insertComment" parameterType="CommentDto">
+    INSERT INTO COMMENT_T (
+        COMMENT_NO
+      , CONTENTS
+      , USER_NO
+      , BLOG_NO
+      , CREATED_AT
+      , STATUS
+      , DEPTH
+      , GROUP_NO
+    ) VALUES (
+        COMMENT_SEQ.NEXTVAL
+      , #{contents}
+      , #{userNo}
+      , #{blogNo}
+      , TO_CHAR(SYSDATE, 'YYYY-MM-DD HH:MI:SS')
+      , 1
+      , 0
+      , COMMENT_SEQ.CURRVAL
+    )
+  </insert>
+  
+  <select id="getCommnetCount" parameterType="int" resultType="int">
+    SELECT COUNT(*)
+      FROM COMMENT_T
+     WHERE BLOG_NO =
+  
+  </select>
   
   
-  
+  <select id="getCommentList" parameterType="Map">
+    SELECT A.COMMENT_NO, A.CONTENTS, A.BLOG_NO, A.CREATED_AT, A.STATUS, A.DEPTH, A.GROUP_NO, A.USER_NO, A.NAME
+    FROM (SELECT ROW_NUMBER() OVER(ORDER BY GROUP_NO DESC, DEPTH ASC, COMMENT_NO DESC) AS RN, C.COMMENT_NO, C.CONTENTS, C.BLOG_NO, C.CREATED_AT, C.STATUS, C.DEPTH, C.GROUP_NO, U.USER_NO, U.NAME
+            FROM USER_T U INNER JOIN COMMENT_T C
+              ON U.USER_NO = C.USER_NO
+           WHERE C.BLOG_NO = #{blogNo}) A
+   WHERE A.RN BETWEEN #{begin} AND #{end}
+  </select>
   
   
   

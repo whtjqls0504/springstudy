@@ -2,7 +2,6 @@ package com.gdu.myhome.controller;
 
 import java.util.Map;
 
-import javax.mail.Multipart;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
@@ -40,10 +39,9 @@ public class BlogController {
   
   @ResponseBody
   @PostMapping(value="/imageUpload.do", produces="application/json")
-  public Map<String, Object> imageUpload(MultipartHttpServletRequest multipartHttpServletRequest) {
-    return blogService.imageUpload(multipartHttpServletRequest);
+  public Map<String, Object> imageUpload(MultipartHttpServletRequest multipartRequest) {
+    return blogService.imageUpload(multipartRequest);
   }
-  
   
   @PostMapping("/addBlog.do")
   public String addBlog(HttpServletRequest request, RedirectAttributes redirectAttributes) {
@@ -51,7 +49,7 @@ public class BlogController {
     redirectAttributes.addFlashAttribute("addResult", addResult);
     return "redirect:/blog/list.do";
   }
-
+  
   @GetMapping("/increseHit.do")
   public String increseHit(@RequestParam(value="blogNo", required=false, defaultValue="0") int blogNo) {
     int increseResult = blogService.increseHit(blogNo);
@@ -69,6 +67,15 @@ public class BlogController {
     model.addAttribute("blog", blog);
     return "blog/detail";
   }
+    
+  @ResponseBody
+  @PostMapping(value="/addComment.do", produces="application/json")
+  public Map<String, Object> addComment(HttpServletRequest request) {
+    return blogService.addComment(request);
+  }
+  
+  
+  
   
   
   

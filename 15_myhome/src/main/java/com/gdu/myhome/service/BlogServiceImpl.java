@@ -22,13 +22,14 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.gdu.myhome.dao.BlogMapper;
 import com.gdu.myhome.dto.BlogDto;
 import com.gdu.myhome.dto.BlogImageDto;
+import com.gdu.myhome.dto.CommentDto;
 import com.gdu.myhome.dto.UserDto;
 import com.gdu.myhome.util.MyFileUtils;
 import com.gdu.myhome.util.MyPageUtils;
 
 import lombok.RequiredArgsConstructor;
 
-@Transactional()
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -88,8 +89,8 @@ public class BlogServiceImpl implements BlogService {
                     .title(title)
                     .contents(contents)
                     .userDto(UserDto.builder()
-                                    .userNo(userNo)
-                                    .build())
+                              .userNo(userNo)
+                              .build())
                     .ip(ip)
                     .build();
     
@@ -144,10 +145,10 @@ public class BlogServiceImpl implements BlogService {
     
   }
   
-  @Transactional(readOnly = true)
+  @Transactional(readOnly=true)
   @Override
   public void loadBlogList(HttpServletRequest request, Model model) {
-    
+  
     Optional<String> opt = Optional.ofNullable(request.getParameter("page"));
     int page = Integer.parseInt(opt.orElse("1"));
     int total = blogMapper.getBlogCount();
@@ -163,6 +164,7 @@ public class BlogServiceImpl implements BlogService {
     model.addAttribute("blogList", blogList);
     model.addAttribute("paging", myPageUtils.getMvcPaging(request.getContextPath() + "/blog/list.do"));
     model.addAttribute("beginNo", total - (page - 1) * display);
+    
   }
   
   @Override
@@ -173,6 +175,25 @@ public class BlogServiceImpl implements BlogService {
   @Override
   public BlogDto getBlog(int blogNo) {
     return blogMapper.getBlog(blogNo);
+  }
+
+  @Override
+  public Map<String, Object> addComment(HttpServletRequest request) {
+
+    String contents = request.getParameter("contents");
+    int userNo = Integer.parseInt(request.getParameter("userNo"));
+    int blogNo = Integer.parseInt(request.getParameter("blogNo"));
+    
+    CommentDto comment = CommentDto.builder()
+                          .contents(contents)
+                          .userNo(userNo)
+                          .blogNo(blogNo)
+                          .build();
+    
+    int addCommentResult = blogMapper.insertComment(comment);
+    
+    return Map.of("addCommentResult", addCommentResult);
+    
   }
   
 }

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.gdu.myhome.dao.FreeMapper;
 import com.gdu.myhome.service.FreeService;
 
 import lombok.RequiredArgsConstructor;
@@ -47,11 +46,11 @@ public class FreeController {
     return "redirect:/free/list.do";
   }
   
-  @PostMapping("/remove.do")            // 파라미터 값이 많을 때, @RequestParam 넣기
-  public String remove(@RequestParam(value = "freeNo") int freeNo, RedirectAttributes redirectAttributes) {
+  @PostMapping("/remove.do")
+  public String remove(@RequestParam(value="freeNo") int freeNo, RedirectAttributes redirectAttributes) {
     int removeResult = freeService.removeFree(freeNo);
     redirectAttributes.addFlashAttribute("removeResult", removeResult);
-    return "redirect:/free/list.do";    // 돌아가는 곳은 list.
+    return "redirect:/free/list.do";
   }
   
   @GetMapping("/search.do")
@@ -59,6 +58,5 @@ public class FreeController {
     freeService.loadSearchList(request, model);
     return "free/list";
   }
-  
   
 }

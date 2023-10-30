@@ -38,7 +38,6 @@ public class MyFileUtils {
     date = date.minusDays(1);  // 1일 전
     return "/blog/" + DateTimeFormatter.ofPattern("yyyy/MM/dd").format(date);
   }
-
   
   
   

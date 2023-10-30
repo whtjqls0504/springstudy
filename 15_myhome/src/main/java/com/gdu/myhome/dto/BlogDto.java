@@ -17,6 +17,5 @@ public class BlogDto {
   private String ip;
   private String createdAt;
   private String modifiedAt;
-  private UserDto userDto;  // private int userNo 대신 userDto를 넣어준다.
-  
+  private UserDto userDto;  // private int userNo;
 }

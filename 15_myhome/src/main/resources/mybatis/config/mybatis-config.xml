@@ -18,8 +18,6 @@
     <typeAlias alias="BlogDto"         type="com.gdu.myhome.dto.BlogDto"/>
     <typeAlias alias="BlogImageDto"    type="com.gdu.myhome.dto.BlogImageDto"/>
     <typeAlias alias="CommentDto"      type="com.gdu.myhome.dto.CommentDto"/>
-    
-   
   </typeAliases>
 
 </configuration>
