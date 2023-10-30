@@ -39,7 +39,7 @@
     </div>
     
     <div>
-      <input type="hidden" name="userNo" value="${sessionScope.user.userNo}">
+      <input type="hidden" name="userNo" value="${sessionScope.user.userDto.userNo}">
       <button class="btn btn-primary col-12" type="submit">작성완료</button>
     </div>
     
