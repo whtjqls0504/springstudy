@@ -27,6 +27,7 @@ public class BlogController {
   
   @GetMapping("/list.do")
   public String list(HttpServletRequest request, Model model) {
+    blogService.loadBlogList(request, model);
     return "blog/list";
   }
   
@@ -48,6 +49,7 @@ public class BlogController {
     redirectAttributes.addFlashAttribute("addResult", addResult);
     return "redirect:/blog/list.do";
   }
+
   
   
 }
