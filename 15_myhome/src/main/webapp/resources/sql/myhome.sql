@@ -160,7 +160,7 @@ COMMIT;
 
 -- 블로그 쿼리 테스트
 
--- 1. 목록 (사용자 - 블로그 조인)
+-- 1. 블로그 목록 (사용자 - 블로그 조인)
 
 -- 부모 : 일대다 관계에서 일(PK, UNIQUE) - 사용자
 -- 자식 : 일대다 관계에서 다(FK)         - 블로그
@@ -175,7 +175,7 @@ SELECT A.BLOG_NO, A.TITLE, A.CONTENTS, A.USER_NO, A.HIT, A.IP, A.CREATED_AT, A.M
             ON B.USER_NO = U.USER_NO) A
  WHERE A.RN BETWEEN 1 AND 10;
 
--- 2. 상세
+-- 2. 블로그 상세
 
 -- 1) 조회수 증가
 UPDATE BLOG_T
@@ -197,7 +197,6 @@ SELECT A.COMMENT_NO, A.CONTENTS, A.BLOG_NO, A.CREATED_AT, A.STATUS, A.DEPTH, A.G
             ON U.USER_NO = C.USER_NO
          WHERE C.BLOG_NO = 2) A
  WHERE A.RN BETWEEN 1 AND 10;
-
 
 
 
