@@ -157,6 +157,31 @@ INSERT INTO FREE_T VALUES (FREE_SEQ.NEXTVAL, 'user1@naver.com', '내용19', SYST
 INSERT INTO FREE_T VALUES (FREE_SEQ.NEXTVAL, 'user1@naver.com', '내용20', SYSTIMESTAMP, 1, 0, FREE_SEQ.CURRVAL, 0);
 COMMIT;
 
+
+-- 블로그 쿼리 테스트 
+
+-- 1. 목록 (사용자 - 블로그 조인)
+-- 부모 : 일대다 관계에서 일(PK, UNIQUE)  - 사용자 
+-- 자식 : 일대다 관계에서 다(FK)          - 블로그
+
+-- 내부 : 사용자와 블로그에 모두 존재하는 데이터를 조인하는 방식
+-- 외부 : 사용자가 없는 블로그도 모두 조인하는 방식      (불가능하다. USER_NO가 NOT NULL이기 때문)
+--        블로그가 없는 사용자도 모두 조인하는 방식이다. (필요없는 조인)
+SELECT A.BLOG_NO, A.TITLE, A.CONTENTS, A.USER_NO, A.HIT, A.IP, A.CREATED_AT, A.MODIFIED_AT, A.EMAIL
+  FROM (SELECT ROW_NUMBER() OVER(ORDER BY BLOG_NO DESC) AS RN, B.BLOG_NO , B.TITLE, B.CONTENTS, B.USER_NO, B.HIT, B.IP, B.CREATED_AT, B.MODIFIED_AT, U.EMAIL
+                FROM USER_T U INNER JOIN BLOG_T B
+                    ON B.USER_NO = U.USER_NO) A
+  WHERE A.RN BETWEEN 1 AND 10;
+  
+-- BLOG_NO의 내림차순, 정렬하고 행번호 붙이기.
+-- 블로그 테이블에 들어있는 정보들을 가져온다. 
+-- USER_NO -> BLOG_T, USER_T에 있는 "공동"쿼리이다.
+
+
+
+
+
+
 -- 쿼리 테스트
 
 -- 1. 목록 (??? 순으로 1 ~ 10)
