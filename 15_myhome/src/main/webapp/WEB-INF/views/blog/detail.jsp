@@ -21,10 +21,44 @@
     <div>작성일 : ${blog.createdAt}</div>
     <div>수정일 : ${blog.modifiedAt}</div>
     <div>
-      버튼구역
+    <!-- 블록의 작성자는 편집/삭제 수행할 수 있다.-->
+    <c:if test="${sessionScope.user.userNo == blog.userDto.userNo}">
+      <form id="frm_btn" method="post">
+        <input type="hidden" name="blogNo" value="#{blog.blogNo}">
+        <button type="button" id="btn_edit">편집</button>
+        <button type="button" id="btn_remove">삭제</button>
+      </form>
+      </c:if>
     </div>
     <div>${blog.contents}</div>
   </div>
+  <script>
+  
+  var frmBtn = $('#frm_btn');
+  	const fnEditBlog = () => {
+  		$('#btn_edit').click(() => {
+  			// location 이동 = get 방식
+  			// 그러나, frm_btn은 post 선언때문에, submit으로 method="post"를 유지한다.
+  			frmBtn.attr('action', '${contextPath}/blog/edit.form');
+  			frmBtn.submit();
+  			
+  		})	
+	}
+  	
+  	const fnRemoveBlog = () => {
+  		$('#btn_remove').click(() => {
+  			if(confirm('블로그를 삭제하면 모든 댓글이 함께 삭제됩니다. 삭제할까요?')){
+  	  			frmBtn.attr('action', '${contextPath}/blog/remove.do');		// edit.form -> remove.do
+  	  			frmBtn.submit();
+  			}
+  		})
+  	}
+  	
+  	// 함수 호출하기 ^^b
+  	fnEditBlog();
+  	fnRemoveBlog();
+  
+  </script>
   
   <hr>
   
