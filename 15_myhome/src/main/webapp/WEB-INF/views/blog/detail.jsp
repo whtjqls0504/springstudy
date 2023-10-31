@@ -135,6 +135,12 @@
             } else {
               str += '<div style="width: 100%; border-bottom: 1px solid gray; margin-left: 32px;">';
             }
+            if(c.status === '0'){
+            	str += '<div>삭제된 댓글입니다. </div>';
+            } else {
+            
+            	
+            }
             str += '  <div>' + c.userDto.name + '</div>';
             str += '  <div>' + c.contents + '</div>';
             str += '  <div style="font-size: 12px;">' + c.createdAt + '</div>';
@@ -142,7 +148,7 @@
               str += '  <div><button type="button" class="btn_open_reply">답글달기</button></div>';
             }
             /************************** 답글 입력 창 **************************/
-            str += '  <div class="blind">';
+            str += '  <div class="blind frm_add_reply_wrap">';
             str += '    <form class="frm_add_reply">';
             str += '      <textarea rows="3" cols="50" name="contents" placeholder="답글을 입력하세요"></textarea>';
             str += '      <input type="hidden" name="userNo" value="${sessionScope.user.userNo}">';
@@ -152,7 +158,10 @@
             str += '    </form>';
             str += '  </div>';
             /******************************************************************/
-            str += '  <div><button type="button" class="btn_remove_comment">삭제</button></div>'
+            str += '  <div>'
+            str += '    <input type="hidden" value="' + c.commentNo + '">';
+            str += '    <i class="fa-regular fa-circle-xmark"></i>'
+            str += ' </div>'
             str += '</div>';
             $('#comment_list').append(str);
           })
@@ -197,18 +206,26 @@
     }
     
     const fnCommentRemove = () => {
-    	// 내용 채우기
-    	$('')
+    	$(document).on('click', '.btn_remove_comment', (ev) =>{
+    		if(confirm('해당 댓글을 삭제할까요?')){
+    		return;	
+    		}
+    		ev.target
+    	})
     }
     fnCommentRemove();
     fnRequiredLogin();
     fnCommentAdd();
     fnCommentList();
     fnCommentReplyAdd();
+    frm_add_reply_wrap
     
     /*
     <div style="width: 100%; border-bottom: 1px solid gray;">
-      <div>이름</div>
+    // 삭제된 댓글/답글
+    
+    // 정상 댓/답글
+    <div>이름</div>
       <div>내용</div>
       <div style="font-size: 12px;">작성일자</div>
       <div><button type="button" class="btn_open_reply">답글달기</button></div>
@@ -222,6 +239,7 @@
         </form>
       </div>
       <div>
+      	<input type="hidden" value="commentNo값">
       	<div><button type="button" class="btn_remove_comment">삭제</button></div>
       </div>
     </div>

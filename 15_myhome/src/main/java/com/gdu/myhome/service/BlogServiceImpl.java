@@ -38,7 +38,7 @@ public class BlogServiceImpl implements BlogService {
   private final BlogMapper blogMapper;
   private final MyFileUtils myFileUtils;
   private final MyPageUtils myPageUtils;
- 
+  
   @Override
   public Map<String, Object> imageUpload(MultipartHttpServletRequest multipartRequest) {
     
@@ -180,27 +180,28 @@ public class BlogServiceImpl implements BlogService {
 
   @Override
   public int modifyBlog(HttpServletRequest request) {
+    
     String title = request.getParameter("title");
     String contents = request.getParameter("contents");
     int blogNo = Integer.parseInt(request.getParameter("blogNo"));
-   
+    
     BlogDto blog = BlogDto.builder()
-                   .title(title)
-                   .contents(contents)
-                   .blogNo(blogNo)
-                   .build();
+                    .title(title)
+                    .contents(contents)
+                    .blogNo(blogNo)
+                    .build();
     
-    // 수정
-    int modifyResult =  blogMapper.updateBlog(blog);
+    int modifyResult = blogMapper.updateBlog(blog);
     
-    // 수정결과
     return modifyResult;
+    
   }
   
   @Override
   public int removeBlog(int blogNo) {
     return blogMapper.deleteBlog(blogNo);
   }
+  
   
   @Override
   public Map<String, Object> addComment(HttpServletRequest request) {
@@ -247,7 +248,7 @@ public class BlogServiceImpl implements BlogService {
     return result;
     
   }
-
+  
   @Override
   public Map<String, Object> addCommentReply(HttpServletRequest request) {
     
@@ -257,22 +258,23 @@ public class BlogServiceImpl implements BlogService {
     int groupNo = Integer.parseInt(request.getParameter("groupNo"));
     
     CommentDto comment = CommentDto.builder()
-                         .contents(contents)
-                         .userDto(UserDto.builder()
-                                  .userNo(userNo)
-                                  .build())
-                         .blogNo(blogNo)
-                         .groupNo(groupNo)
-                         .build();
+                          .contents(contents)
+                          .userDto(UserDto.builder()
+                                    .userNo(userNo)
+                                    .build())
+                          .blogNo(blogNo)
+                          .groupNo(groupNo)
+                          .build();
     
     int addCommentReplyResult = blogMapper.insertCommentReply(comment);
     
     return Map.of("addCommentReplyResult", addCommentReplyResult);
+    
   }
   
   @Override
   public Map<String, Object> removeComment(int commentNo) {
-    int removeResult = blogMapper.deleteBlog(commentNo);
+    int removeResult = blogMapper.deleteComment(commentNo);
     return Map.of("removeResult", removeResult);
   }
   
