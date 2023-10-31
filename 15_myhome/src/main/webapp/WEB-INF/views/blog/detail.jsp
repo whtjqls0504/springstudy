@@ -21,43 +21,40 @@
     <div>작성일 : ${blog.createdAt}</div>
     <div>수정일 : ${blog.modifiedAt}</div>
     <div>
-    <!-- 블록의 작성자는 편집/삭제 수행할 수 있다.-->
-    <c:if test="${sessionScope.user.userNo == blog.userDto.userNo}">
-      <form id="frm_btn" method="post">
-        <input type="hidden" name="blogNo" value="#{blog.blogNo}">
-        <button type="button" id="btn_edit">편집</button>
-        <button type="button" id="btn_remove">삭제</button>
-      </form>
+      <!-- 블로그의 작성자는 편집/삭제를 수행할 수 있다. -->
+      <c:if test="${sessionScope.user.userNo == blog.userDto.userNo}">
+        <form id="frm_btn" method="post">
+          <input type="hidden" name="blogNo" value="${blog.blogNo}">
+          <button type="button" id="btn_edit">편집</button>
+          <button type="button" id="btn_remove">삭제</button>
+        </form>
       </c:if>
     </div>
     <div>${blog.contents}</div>
   </div>
   <script>
+    
+    var frmBtn = $('#frm_btn');
   
-  var frmBtn = $('#frm_btn');
-  	const fnEditBlog = () => {
-  		$('#btn_edit').click(() => {
-  			// location 이동 = get 방식
-  			// 그러나, frm_btn은 post 선언때문에, submit으로 method="post"를 유지한다.
-  			frmBtn.attr('action', '${contextPath}/blog/edit.form');
-  			frmBtn.submit();
-  			
-  		})	
-	}
-  	
-  	const fnRemoveBlog = () => {
-  		$('#btn_remove').click(() => {
-  			if(confirm('블로그를 삭제하면 모든 댓글이 함께 삭제됩니다. 삭제할까요?')){
-  	  			frmBtn.attr('action', '${contextPath}/blog/remove.do');		// edit.form -> remove.do
-  	  			frmBtn.submit();
-  			}
-  		})
-  	}
-  	
-  	// 함수 호출하기 ^^b
-  	fnEditBlog();
-  	fnRemoveBlog();
-  
+    const fnEditBlog = () => {
+      $('#btn_edit').click(() => {
+        frmBtn.attr('action', '${contextPath}/blog/edit.form');
+        frmBtn.submit();
+      })
+    }
+    
+    const fnRemoveBlog = () => {
+      $('#btn_remove').click(() => {
+        if(confirm('블로그를 삭제하면 모든 댓글이 함께 삭제됩니다. 삭제할까요?')){
+          frmBtn.attr('action', '${contextPath}/blog/remove.do');
+          frmBtn.submit();          
+        }
+      })
+    }
+    
+    fnEditBlog();
+    fnRemoveBlog();
+    
   </script>
   
   <hr>
@@ -141,6 +138,21 @@
             str += '  <div>' + c.userDto.name + '</div>';
             str += '  <div>' + c.contents + '</div>';
             str += '  <div style="font-size: 12px;">' + c.createdAt + '</div>';
+            if(c.depth === 0){
+              str += '  <div><button type="button" class="btn_open_reply">답글달기</button></div>';
+            }
+            /************************** 답글 입력 창 **************************/
+            str += '  <div class="blind">';
+            str += '    <form class="frm_add_reply">';
+            str += '      <textarea rows="3" cols="50" name="contents" placeholder="답글을 입력하세요"></textarea>';
+            str += '      <input type="hidden" name="userNo" value="${sessionScope.user.userNo}">';
+            str += '      <input type="hidden" name="blogNo" value="${blog.blogNo}">';
+            str += '      <input type="hidden" name="groupNo" value="' + c.groupNo + '">';
+            str += '      <button type="button" class="btn_add_reply">답글작성완료</button>';
+            str += '    </form>';
+            str += '  </div>';
+            /******************************************************************/
+            str += '  <div><button type="button" class="btn_remove_comment">삭제</button></div>'
             str += '</div>';
             $('#comment_list').append(str);
           })
@@ -154,15 +166,64 @@
       fnCommentList();
     }
     
+    const fnCommentReplyAdd = () => {
+    	$(document).on('click', '.btn_add_reply', (ev) => {
+    		if('${sessionScope.user}' === ''){
+    			if(confirm('로그인이 필요한 기능입니다. 로그인할까요?')){
+    				location.href = '${contextPath}/user/login.form';
+    			} else {
+    				return;
+    			}
+    		}
+    		var frmAddReply = $(ev.target).closest('.frm_add_reply');
+    		$.ajax({
+    			// 요청
+    			type: 'post',
+    			url: '${contextPath}/blog/addCommentReply.do',
+    			data: frmAddReply.serialize(),
+    			// 응답
+    			dataType: 'json',
+    			success: (resData) => {  // resData = {"addCommentReplyResult": 1}
+    				if(resData.addCommentReplyResult === 1){
+    					alert('답글이 등록되었습니다.');
+    					fnCommentList();
+    					frmAddReply.find('textarea').val('');
+    				} else {
+    					alert('답글이 등록되지 않았습니다.');
+    				}
+    			}
+    		})
+    	})
+    }
+    
+    const fnCommentRemove = () => {
+    	// 내용 채우기
+    	$('')
+    }
+    fnCommentRemove();
     fnRequiredLogin();
     fnCommentAdd();
     fnCommentList();
+    fnCommentReplyAdd();
     
     /*
     <div style="width: 100%; border-bottom: 1px solid gray;">
       <div>이름</div>
       <div>내용</div>
       <div style="font-size: 12px;">작성일자</div>
+      <div><button type="button" class="btn_open_reply">답글달기</button></div>
+      <div class="blind">
+        <form class="frm_add_reply">
+          <textarea rows="3" cols="50" name="contents" placeholder="답글을 입력하세요"></textarea>
+          <input type="hidden" name="userNo" value="">
+          <input type="hidden" name="blogNo" value="">
+          <input type="hidden" name="groupNo" value="">
+          <button type="button" class="btn_add_reply">답글작성완료</button>
+        </form>
+      </div>
+      <div>
+      	<div><button type="button" class="btn_remove_comment">삭제</button></div>
+      </div>
     </div>
     */
     
