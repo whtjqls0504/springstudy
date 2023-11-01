@@ -16,5 +16,4 @@ public class BbsDto {
   private String contents;
   private Date createdAt;
   private Date modifiedAt;
-  
 }

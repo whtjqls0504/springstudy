@@ -19,11 +19,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-@MapperScan(basePackages="com.gdu.bbs.dao")
+@EnableTransactionManagement                    // @Transactional 허용
+@EnableAspectJAutoProxy                         // @Aspect 허용
+@EnableScheduling                               // @Scheduled 허용
+@MapperScan(basePackages="com.gdu.bbs.dao")     // @Mapper를 찾을 패키지
 @PropertySource(value="classpath:application.properties")
-@EnableScheduling             // @Scheduled 허용
-@EnableTransactionManagement  // @Transactional 허용
-@EnableAspectJAutoProxy
 @Configuration
 public class AppConfig {
 
@@ -68,7 +68,5 @@ public class AppConfig {
   public TransactionManager transactionManager() {
     return new DataSourceTransactionManager(hikariDataSource());
   }
-
-  
   
 }

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- mapper namespace : mapper의 경로 -->
+<mapper namespace="com.goodee.app.dao.BoardMapper">
+
+  <!-- 목록(begin/end 전달, List반환) -->  
+  <select id="getBoardList" parameterType="Map" resultType="BoardDto">
+    SELECT BOARD_NO, WRITER, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
+      FROM (SELECT ROW_NUMBER() OVER(ORDER BY BOARD_NO DESC)AS RN, BOARD_NO, WRITER, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
+              FROM BOARD_T)
+     WHERE RN BETWEEN #{begin} AND #{end}
+  </select>
+
+<!-- 목록 갯수(전달 int parameterType x,) -->
+  <select id="getBoardCount" resultType="int">
+    SELECT COUNT(*)
+      FROM BOARD_T
+  </select>
+  
+<!-- 상세보기-->
+<select id="getBoard" parameterType="int" resultType="BoardDto">
+  SELECT BOARD_NO, WRITER, TITLE, CONTENTS, CREATED_AT, MODIFIED_AT
+    FROM BOARD_T
+   WHERE BOARD_NO = #{boardNo}
+</select>
+
+<!-- 삽입 --> 
+<insert id="insertBoard" parameterType="BoardDto">
+  INSERT INTO BOARD_T(
+      BOARD_NO
+    , WRITER
+    , TITLE
+    , CONTENTS
+    , CREATED_AT
+    , MODIFIED_AT
+  ) VALUES (
+      BOARD_SEQ.NEXTVAL
+    , #{writer}
+    , #{title}
+    , #{contents}
+    , SYSTIMESTAMP
+    , SYSTIMESTAMP
+  )
+</insert>
+
+<!-- 수정 --> 
+<update id="updateBoard" parameterType="BoardDto">
+  UPDATE BOARD_T
+       SET TITLE = #{title}
+         , CONTENTS = #{contents}
+         , MODIFIED_AT = SYSDATE
+</update>
+
+<!-- 삭제-->
+<delete id="deleteBoard" parameterType="int">
+  DELETE 
+    FROM BOARD_T
+   WHERE BOARD_NO = #{boardNo}
+</delete>
+
+
+</mapper>

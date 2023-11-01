@@ -19,7 +19,6 @@ public interface BlogService {
   public int modifyBlog(HttpServletRequest request);
   public int removeBlog(int blogNo);
   
-  
   public Map<String, Object> addComment(HttpServletRequest request);
   public Map<String, Object> loadCommentList(HttpServletRequest request);
   public Map<String, Object> addCommentReply(HttpServletRequest request);

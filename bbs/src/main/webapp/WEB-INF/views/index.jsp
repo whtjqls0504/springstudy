@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html>
@@ -11,8 +11,8 @@
 </head>
 <body>
 
-  <h1>보충수업</h1>
-  <a href="${contextPath}/list.do">게시판</a>  <!-- /bss 설정을 했기 땜에 필요없슴다. -->
+  <h1>Hello World</h1>
+  <a href="${contextPath}/list.do">게시판</a>
 
 </body>
 </html>

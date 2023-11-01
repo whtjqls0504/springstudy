@@ -27,4 +27,3 @@ public interface BlogMapper {
   public int insertCommentReply(CommentDto comment);
   public int deleteComment(int commentNo);
 }
- 

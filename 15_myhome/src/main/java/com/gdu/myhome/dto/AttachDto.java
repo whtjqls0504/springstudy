@@ -1,14 +1,15 @@
 package com.gdu.myhome.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class AttachDto {
-
   private int attachNo;
   private String path;
   private String originalFilename;
@@ -16,5 +17,4 @@ public class AttachDto {
   private int downloadCount;
   private int hasThumbnail;
   private int uploadNo;
-  
 }

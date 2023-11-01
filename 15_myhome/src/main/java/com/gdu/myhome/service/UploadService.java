@@ -1,5 +1,7 @@
 package com.gdu.myhome.service;
 
-public interface UploadService {
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+public interface UploadService {
+  public boolean addUpload(MultipartHttpServletRequest multipartRequest) throws Exception;
 }
