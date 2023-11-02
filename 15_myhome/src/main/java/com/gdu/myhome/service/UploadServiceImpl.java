@@ -3,6 +3,10 @@ package com.gdu.myhome.service;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +21,6 @@ import com.gdu.myhome.util.MyFileUtils;
 import com.gdu.myhome.util.MyPageUtils;
 
 import lombok.RequiredArgsConstructor;
-import net.coobird.thumbnailator.Thumbnailator;
 import net.coobird.thumbnailator.Thumbnails;
 
 @Transactional
@@ -48,15 +51,16 @@ public class UploadServiceImpl implements UploadService {
     
     List<MultipartFile> files = multipartRequest.getFiles("files");
     
-    // 첨부 없을 때 : 
-    // 첨부 1개     : 
+    // 첨부 없을 때 : [MultipartFile[field="files", filename=, contentType=application/octet-stream, size=0]]
+    // 첨부 1개     : [MultipartFile[field="files", filename="animal1.jpg", contentType=image/jpeg, size=123456]]
     
-    int attachCount = 0;
-    if(files.get(0).getOriginalFilename().isEmpty()) {
+    int attachCount;
+    if(files.get(0).getSize() == 0) {
       attachCount = 1;
     } else {
       attachCount = 0;
     }
+    
     for(MultipartFile multipartFile : files) {
       
       if(multipartFile != null && !multipartFile.isEmpty()) {
@@ -101,7 +105,25 @@ public class UploadServiceImpl implements UploadService {
     
   }
   
-  
+  @Override
+  public Map<String, Object> getUploadList(HttpServletRequest request) {
+    
+    Optional<String> opt = Optional.ofNullable(request.getParameter("page"));
+    int page = Integer.parseInt(opt.orElse("1"));
+    int total = uploadMapper.getUploadCount();
+    int display = 9;
+    
+    myPageUtils.setPaging(page, total, display);
+    
+    Map<String, Object> map = Map.of("begin", myPageUtils.getBegin()
+                                   , "end", myPageUtils.getEnd());
+    
+    List<UploadDto> uploadList = uploadMapper.getUploadList(map);
+    
+    return Map.of("uploadList", uploadList
+                , "totalPage", myPageUtils.getTotalPage());
+    
+  }
   
   
   
