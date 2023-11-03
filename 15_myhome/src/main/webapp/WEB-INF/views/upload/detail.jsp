@@ -11,9 +11,8 @@
 </jsp:include>
 
 <style>
-
   .attach {
-    cursor : pointer;
+    cursor: pointer;
   }
 </style>
 
@@ -35,48 +34,42 @@
   </div>
   
   <hr>
-  <h3>첨부 다운로드</h3>
   
+  <h4>첨부 다운로드</h4>
   <div>
     <c:if test="${empty attachList}">
-      <div>첨부 없음</div>    
-    </c:if>   
+      <div>첨부 없음</div>
+    </c:if>
     <c:if test="${not empty attachList}">
       <c:forEach items="${attachList}" var="atc">
-        <div class="attach" data-attach_no = ${atc.attachNo}>
-        <c:if test="${atc.hasThumbnail == 1}">
-          <img src="${contextPath}${atc.path}/s_${atc.filesystemname}" alt="썸네일">
-        </c:if>
-        <c:if test="${atc.hasThumbnail == 0}">
-          <img src="${contextPath}/resources/image/attach1.png" alt="썸네일"  width="50px">
-        </c:if>
-        ${atc.originalFilename}
+        <div class="attach" data-attach_no="${atc.attachNo}">
+          <c:if test="${atc.hasThumbnail == 1}">
+            <img src="${contextPath}${atc.path}/s_${atc.filesystemName}" alt="썸네일" width="50px">
+          </c:if>
+          <c:if test="${atc.hasThumbnail == 0}">
+            <img src="${contextPath}/resources/image/attach1.png" alt="썸네일" width="50px">
+          </c:if>
+          ${atc.originalFilename}
         </div>
       </c:forEach>
+      <div><a href="${contextPath}/upload/downloadAll.do?uploadNo=${upload.uploadNo}">모두 다운로드</a></div>
     </c:if>
   </div>
-  <div id="file_list"></div>
   
 </div>
   
 <script>
 
-	const fnDownload = () => {
-		$('.attach').click(function () {
-			if(confirm('다운로드 할까요?')){
-				$.ajax({
-					type :'get',
-					url : '${contextPath}/upload/download.do'.
-					data : 'attachNo=' + $(this).data('attach_no')
-				})
-				
-				
-			}
-		})
-	}
-
-	fnDownload();
-
+  const fnDownload = () => {
+	  $('.attach').click(function(){
+		  if(confirm('다운로드 할까요?')){
+			  location.href = '${contextPath}/upload/download.do?attachNo=' + $(this).data('attach_no');
+		  }
+	  })
+  }
+  
+  fnDownload();
+  
 </script>
   
 <%@ include file="../layout/footer.jsp" %>

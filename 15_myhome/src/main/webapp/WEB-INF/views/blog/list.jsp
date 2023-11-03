@@ -21,8 +21,8 @@
   <hr>
   
   <div>
-    <table border="1">
-      <thead>
+    <table border="1" class="table">
+      <thead class="table-light">
         <tr>
           <td>순번</td>
           <td>제목</td>

@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.gdu.myhome.service.UploadService;
 
 import lombok.RequiredArgsConstructor;
-import oracle.jdbc.proxy.annotation.Post;
 
 @RequestMapping("/upload")
 @RequiredArgsConstructor
@@ -36,15 +37,15 @@ public class UploadController {
   }
   
   @PostMapping("/add.do")
-  public String add(MultipartHttpServletRequest multiparRequest
-                    , RedirectAttributes redirectAttributes) throws Exception {
-    boolean addResult = uploadService.addUpload(multiparRequest);
+  public String add(MultipartHttpServletRequest multipartRequest
+                  , RedirectAttributes redirectAttributes) throws Exception {
+    boolean addResult = uploadService.addUpload(multipartRequest);
     redirectAttributes.addFlashAttribute("addResult", addResult);
     return "redirect:/upload/list.do";
   }
   
   @ResponseBody
-  @GetMapping(value = "/getList.do", produces = "application/json")
+  @GetMapping(value="/getList.do", produces="application/json")
   public Map<String, Object> getList(HttpServletRequest request){
     return uploadService.getUploadList(request);
   }
@@ -54,5 +55,21 @@ public class UploadController {
     uploadService.loadUpload(request, model);
     return "upload/detail";
   }
+  
+  @GetMapping("/download.do")
+  public ResponseEntity<Resource> download(HttpServletRequest request) {
+    return uploadService.download(request);
+  }
+  
+  @GetMapping("/downloadAll.do")
+  public ResponseEntity<Resource> downloadAll(HttpServletRequest request) {
+    return uploadService.downloadAll(request);
+  }
+  
+  
+  
+  
+  
+  
   
 }
