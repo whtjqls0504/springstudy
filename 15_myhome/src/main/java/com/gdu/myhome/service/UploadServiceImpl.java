@@ -391,7 +391,7 @@ public class UploadServiceImpl implements UploadService {
   @Override
   public int removeUpload(int uploadNo) {
     // 파일 삭제
-    
+    List<AttachDto> attachList = 
     
     // UPLOAD_T 삭제
     return 0;

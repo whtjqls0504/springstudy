@@ -100,4 +100,7 @@ public class UploadController {
     return uploadService.addAttach(multipartRequest);
   }
   
+  @PostMapping("/removeUpload.do")
+  public String delete
+  
 }
