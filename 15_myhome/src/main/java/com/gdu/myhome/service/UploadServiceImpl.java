@@ -19,7 +19,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -275,7 +274,6 @@ public class UploadServiceImpl implements UploadService {
   
   @Override
   public void removeTempFiles() {
-    // 파일 디렉터리 > 새로운 파일 디렉터리 생성.
     File tempDir = new File(myFileUtils.getTempPath());
     File[] targetList = tempDir.listFiles();
     if(targetList != null) {
@@ -283,7 +281,120 @@ public class UploadServiceImpl implements UploadService {
         target.delete();
       }
     }
+  }
+  
+  @Transactional(readOnly=true)
+  @Override
+  public UploadDto getUpload(int uploadNo) {
+    return uploadMapper.getUpload(uploadNo);
+  }
+  
+  @Override
+  public int modifyUpload(UploadDto upload) {
+    return uploadMapper.updateUpload(upload);
+  }
+  
+  @Override
+  public Map<String, Object> getAttachList(HttpServletRequest request) {
     
+    Optional<String> opt = Optional.ofNullable(request.getParameter("uploadNo"));
+    int uploadNo = Integer.parseInt(opt.orElse("0"));
+    
+    return Map.of("attachList", uploadMapper.getAttachList(uploadNo));
+    
+  }
+  
+  @Override
+  public Map<String, Object> removeAttach(HttpServletRequest request) {
+    
+    Optional<String> opt = Optional.ofNullable(request.getParameter("attachNo"));
+    int attachNo = Integer.parseInt(opt.orElse("0"));
+    
+    // 파일 삭제
+    AttachDto attach = uploadMapper.getAttach(attachNo);
+    File file = new File(attach.getPath(), attach.getFilesystemName());
+    if(file.exists()) {
+      file.delete();
+    }
+    
+    // 썸네일 삭제
+    if(attach.getHasThumbnail() == 1) {
+      File thumbnail = new File(attach.getPath(), "s_" + attach.getFilesystemName());
+      if(thumbnail.exists()) {
+        thumbnail.delete();
+      }
+    }
+    
+    // ATTACH_T 삭제
+    int removeResult = uploadMapper.deleteAttach(attachNo);
+    
+    return Map.of("removeResult", removeResult);
+    
+  }
+  
+  @Override
+  public Map<String, Object> addAttach(MultipartHttpServletRequest multipartRequest) throws Exception {
+    
+    List<MultipartFile> files =  multipartRequest.getFiles("files");
+    
+    int attachCount;
+    if(files.get(0).getSize() == 0) {
+      attachCount = 1;
+    } else {
+      attachCount = 0;
+    }
+    
+    for(MultipartFile multipartFile : files) {
+      
+      if(multipartFile != null && !multipartFile.isEmpty()) {
+        
+        String path = myFileUtils.getUploadPath();
+        File dir = new File(path);
+        if(!dir.exists()) {
+          dir.mkdirs();
+        }
+        
+        String originalFilename = multipartFile.getOriginalFilename();
+        String filesystemName = myFileUtils.getFilesystemName(originalFilename);
+        File file = new File(dir, filesystemName);
+        
+        multipartFile.transferTo(file);
+        
+        String contentType = Files.probeContentType(file.toPath());  // 이미지의 Content-Type은 image/jpeg, image/png 등 image로 시작한다.
+        int hasThumbnail = (contentType != null && contentType.startsWith("image")) ? 1 : 0;
+        
+        if(hasThumbnail == 1) {
+          File thumbnail = new File(dir, "s_" + filesystemName);  // small 이미지를 의미하는 s_을 덧붙임
+          Thumbnails.of(file)
+                    .size(100, 100)      // 가로 100px, 세로 100px
+                    .toFile(thumbnail);
+        }
+        
+        AttachDto attach = AttachDto.builder()
+                            .path(path)
+                            .originalFilename(originalFilename)
+                            .filesystemName(filesystemName)
+                            .hasThumbnail(hasThumbnail)
+                            .uploadNo(Integer.parseInt(multipartRequest.getParameter("uploadNo")))
+                            .build();
+        
+        attachCount += uploadMapper.insertAttach(attach);
+        
+      }  // if
+      
+    }  // for
+    
+    return Map.of("attachResult", files.size() == attachCount);
+    
+  }
+  
+  @Override
+  public int removeUpload(int uploadNo) {
+    // 파일 삭제
+    
+    
+    // UPLOAD_T 삭제
+    return 0;
   }
   
   
